@@ -7,14 +7,26 @@ import pygame
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state
 from player import Player
+from asteroid import Asteroid
+from asteroidfield import AsteroidField
 
 def main():
     dt: float = 0.0
 
     #Initialises the pygame
     pygame.init()
+    # Creatng new groups for objects
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+
+    #Setting containers
+    Player.containers = (updatable, drawable)
+    Asteroid.containers = (asteroids, updatable, drawable)
+    AsteroidField.containers = (updatable,)
     # New object created "Player"
     player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+    asteroidfield = AsteroidField()
 
     # New clock variable created
     clock = pygame.time.Clock()
@@ -30,10 +42,13 @@ def main():
         screen.fill("black")
 
         #Render the player after filling the screen black
-        player.draw(screen)
+        #Reworked to iterate over all drawable objects in group drawable
+        #player.draw(screen)
+        for can_draw in drawable:
+            can_draw.draw(screen)
 
         #Update the player frame if a or d are pressed (rotate)
-        player.update(dt)
+        updatable.update(dt)
 
         #Refreshes the screen (i think)
         pygame.display.flip()
